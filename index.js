@@ -1,14 +1,21 @@
 const express = require("express");
 const userRouter = require("./router/user");
-const todoRouter = require("./router/todo");
-const { port } = require("./config");
+const todoRouter = require("./router/Blog");
+const { port, CLOUD_NAME, API_KEY, API_SECRET } = require("./config");
+const cors = require("cors");
+const cloudinary = require("cloudinary");
+cloudinary.config({
+  cloud_name: CLOUD_NAME,
+  api_key: API_KEY,
+  api_secret: API_SECRET
+});
 require("./db");
 const app = express();
 
 app.use(express.json());
-
+app.use(cors());
 app.use("/users", userRouter);
-app.use("/todos", todoRouter);
+app.use("/Blogs", todoRouter);
 
 app.use((err, req, res, next) => {
   err.statusCode = err.statusCode || 500;

@@ -10,14 +10,15 @@ const verifyJWT = util.promisify(jwt.verify);
 
 const schema = new mongoose.Schema(
   {
-    userName: {
+    email: {
       type: String,
-      required: true,
-      unique: true
+      unique: true,
+      required: true
     },
     password: {
       type: String,
-      required: true
+      required: true,
+      minlength: [8, "minimum length of Password 8"]
     },
     firstName: {
       type: String,
@@ -25,10 +26,18 @@ const schema = new mongoose.Schema(
       minlength: 3,
       maxlength: 15
     },
-    age: {
-      type: Number,
-      min: 13
-    }
+    lastName: {
+      type: String,
+      minlength: 3,
+      maxlength: 15
+    },
+    imgPath: {
+      type: String
+    },
+    aboutU: {
+      type: String
+    },
+    followedUsers: { type: [mongoose.Schema.Types.ObjectId], ref: "User" }
   },
   {
     toJSON: {
@@ -36,6 +45,7 @@ const schema = new mongoose.Schema(
     }
   }
 );
+
 schema.pre("save", async function() {
   const currentDocument = this;
   if (currentDocument.isModified("password")) {
@@ -43,7 +53,6 @@ schema.pre("save", async function() {
       currentDocument.password,
       Number(saltRounds)
     );
-    console.log(currentDocument);
   }
 });
 
@@ -54,9 +63,11 @@ schema.methods.checkPassword = function(plainPassword) {
 
 schema.methods.generateToken = function() {
   const currentDocument = this;
-  return signJWT({ id: currentDocument.id }, jwtSecret, {
-    expiresIn: "2h"
-  });
+  return signJWT(
+    { id: currentDocument.id },
+    jwtSecret
+    //  , { expiresIn: "20m"}
+  );
 };
 
 schema.statics.getUserFromToken = async function(token) {

@@ -1,10 +1,10 @@
 const User = require("../model/User");
-module.exports = todoId => async (req, res, next) => {
-  console.log(todoId);
-  const todo = User.findOne({ _id: todoId });
+const Blog = require("../model/Blog");
+module.exports = blogId => async (req, res, next) => {
+  const blog = Blog.findOne({ _id: blogId });
   req.user = await User.getUserFromToken(autherization);
-  if (req.user._id != todo.userId) {
-    const error = new CustomError("Validation Error", 422, errors.mapped());
+  if (req.user._id != blog.auther) {
+    const error = new CustomError("Unauthorized user", 422, errors.mapped());
     return next(error);
   }
   next();
